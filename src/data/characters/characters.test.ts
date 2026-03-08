@@ -1,38 +1,34 @@
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
-import { Character, CreateCharacter, DeleteCharacterByID, GetCharacterByID, GetCharacters, ResetCharacters, UpdateCharacterByID } from "./characters";
-import { ResultStatus } from "../types/result";
+import { Character, CreateCharacter, DeleteCharacterByID, GetCharacterByID, GetCharacters, UpdateCharacterByID } from "./characters";
+import { ResultStatus } from "../../types/result";
 
-beforeEach(() => {
-    ResetCharacters();
-});
-
-describe("CreateCharacter", () => {
-    it("should create a character with valid fields", () => {
-        const result = CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
+describe("CreateCharacter", async () => {
+    it("should create a character with valid fields", async () => {
+        const result = await CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
         const char = result.data as Character
         assert.strictEqual(result.success, ResultStatus.OK);
         assert.strictEqual(char.name, "Rogmar");
         assert.strictEqual(char.level, 2);
         assert.strictEqual(char.class, "Barbarian");
     });
-    it("should fail when name is missing a value", () => {
-        const result = CreateCharacter({ name: "", class: "Barbarian", level: 2 });
+    it("should fail when name is missing a value", async () => {
+        const result = await CreateCharacter({ name: "", class: "Barbarian", level: 2 });
         assert.strictEqual(result.success, ResultStatus.Failed);
     });
-    it("should fail when class is missing a value", () => {
-        const result = CreateCharacter({ name: "Nathan", class: "", level: 2 });
+    it("should fail when class is missing a value", async () => {
+        const result = await CreateCharacter({ name: "Nathan", class: "", level: 2 });
         assert.strictEqual(result.success, ResultStatus.Failed);
     });
-    it("should return level: 1 is level is missing a value", () => {
+    it("should return level: 1 is level is missing a value", async () => {
         const result = CreateCharacter({ name: "Nathan", class: "Fighter" });
         const char = result.data as Character;
 
         assert.strictEqual(char.level, 1);
     });
-    it("should auto-increment id by for each new char", () => {
+    it("should auto-increment id by for each new char", async () => {
         for (let i = 1; i <= 10; i++) {
-            const result = CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
+            const result = await CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
             const char = result.data as Character;
             assert.strictEqual(char.id, i);
         }
@@ -58,24 +54,24 @@ describe("GetCharacters", () => {
 });
 
 describe("UpdateCharacterByID", () => {
-    it("should update a character", () => {
+    it("should update a character", async () => {
         CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
-        const result = UpdateCharacterByID(1, { name: "Nathan" });
-        const char = result.data as Character;
+        const result = await UpdateCharacterByID(1, { name: "Nathan" });
+        const char = await result.data as Character;
 
         assert.strictEqual(result.success, ResultStatus.OK);
         assert.strictEqual(char.name, "Nathan");
     });
-    it("should fail when field doesnt exist", () => {
+    it("should fail when field doesnt exist", async () => {
         CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
-        const result = UpdateCharacterByID(1, { wrongName: "Nathan" });
+        const result = await UpdateCharacterByID(1, { wrongName: "Nathan" });
         const char = result.data as Character;
 
         assert.strictEqual(result.success, ResultStatus.Failed);
     });
-    it("should fail when index doesnt exist", () => {
+    it("should fail when index doesnt exist", async () => {
         CreateCharacter({ name: "Rogmar", class: "Barbarian", level: 2 });
-        const result = UpdateCharacterByID(2, { name: "Nathan" });
+        const result = await UpdateCharacterByID(2, { name: "Nathan" });
 
         assert.strictEqual(result.success, ResultStatus.Failed);
     });
